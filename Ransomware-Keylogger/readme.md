@@ -1,68 +1,71 @@
-# 💻 Desafio de Simulação e Prevenção de Ataques de Força Bruta
+# 🛡️ Projeto de Simulação de Malware para Fins Educacionais
 
-## 1. Visão Geral do Projeto
+## Visão Geral do Projeto
 
-Este desafio documenta um teste isolado a análise de vulnerabilidades de **ataque de força bruta**utilizando o Kali Linux e a ferramenta Medusa.
+Este projeto foi desenvolvido como parte do curso **CyberSegurança Santander DIO** com o objetivo de **semelhante, analisar e documentar** o funcionamento de duas ameaças digitais comuns — **Ransomware** e **Keylogger** — utilizando Python.
 
-O objetivo principal é exercitar medidas de **segurança defensiva**, entendendo como os ataques são realizados para implementar estratégias de **prevenção e mitigação**.
-
-**Tecnologias Utilizadas:**
-* **Ataque/Teste:** Kali Linux, Medusa (Ferramenta de Brute Force)
-* **Alvo:** Metasploitable 2
-* **Virtualização:** VMWare - MacOs Tahoe
+**⚠️ Aviso Importante:**O objetivo principal é exercer medidas de **⚠️ Aviso Importante:** Todos os scripts foram executados e testados em um **ambiente 100% isolado (Maquina Virtual)** e possivelmente fins estratamente 
 
 ---
 
-## 2. Configuração do Ambiente de Teste
+## 1. Ransomware Simulado (Cripto-Malware)
 
-O ambiente foi configurado com duas Máquinas Virtuais (VMs) isoladas, conectadas por uma rede Host-Only, garantindo que o tráfego simulado fique contido.
+A simulação demonstra como o Ransomware utiliza criptografia simétrica para sequestrar dados e exigir um resgate.
 
-| Kali Línux | Metasploitable 2 |
-| :--- | :--- |
-| 192.168.56.101 | 192.168.56.102 |
+### ⚙️ Detalhes da Implementação
 
-****
-
----
-
-## 3. Cenários de Ataque Simulados e Análise
-
-Os testes foram realizados utilizando a ferramenta **Medusa** para validar a exposição de serviços a ataques de dicionário e *password spraying*.
-
-| Serviço Alvo | Ferramenta Utilizada | Análise de Vulnerabilidade | Mitigação Abordada |
-| :--- | :--- | :--- | :--- |
-| **A. FTP (Porta 21)** | Medusa (`-M ftp`) | **Vulnerabilidade:** Permite tentativas de login ilimitadas sem bloqueio de IP ou atraso. | Bloqueio de IP após `N` falhas, Desativação de FTP Anônimo. |
-| **B. Formulário Web (DVWA)** | Medusa/Script Customizado | **Vulnerabilidade:** Falha na implementação de **Rate Limiting** e ausência de **CAPTCHA** no login. | Implementação de CAPTCHA e 2FA. |
-| **C. SMB (Password Spraying)** | Medusa (`-M smb`) | **Vulnerabilidade:** Falha ao forçar a complexidade das senhas, permitindo que uma senha simples funcione para muitos usuários. | Monitoramento de múltiplos bloqueios, Política de Senha Forte. |
-
----
-
-## 4. Documentação dos Testes e Artefatos
-
-* **Comandos Utilizados (Estrutura Genérica):**
-    ```bash
-    medusa -h [192.168.56.102] -u [usuarios.txt] -P [senhas.txt] -M [ftp] -n [21]
-    ```
-* **Wordlists:** (Arquivos localizados na pasta `\wordlists`)
-    * `wordlists/usuarios.txt`: Lista simples de usuários comuns do Metasploitable 2 (ex: `msfadmin`, `user`, `postgres`).
-    * `wordlists/senhas.txt`: Lista de senhas extremamente fracas para validação inicial (ex: `password`, `123456`,msfadmin, `test`).
-
----
-
-## 5. Recomendações de Mitigação e Defesa (Foco Principal) 🛡️
-
-Com base nas vulnerabilidades expostas, as seguintes medidas de segurança são essenciais para prevenir ataques de força bruta:
-
-| Área de Defesa | Estratégia de Mitigação | Detalhes e Implementação |
+| Recurso | Descrição | Tecnologia |
 | :--- | :--- | :--- |
-| **Acesso e Autenticação** | **Autenticação Multifator (MFA/2FA)** | Exigir um segundo fator (código TOTP, push notification) após o login, tornando o ataque de força bruta inútil, pois ele não pode adivinhar o token temporário. |
-| **Limitação de Tentativas** | **Rate Limiting e Bloqueio Temporário** | Aplicar regras em firewalls ou no servidor de aplicação (ex: `iptables`, Cloudflare) que bloqueiem o endereço IP de origem por um tempo após um número pequeno de tentativas de login malsucedidas (ex: 5 falhas). |
-| **Gerenciamento de Senhas** | **Política de Senhas Robustas** | Exigir comprimento mínimo de **12 caracteres** e utilizar **hashing seguro** (preferencialmente **Argon2** ou **bcrypt**) para armazenamento, tornando a quebra de senhas offline inviável. |
-| **Defesa Web (DVWA)** | **CAPTCHA Inteligente** | Utilizar mecanismos de desafio (CAPTCHA) após a primeira falha de login, dificultando a automação por scripts. |
-| **Monitoramento** | **Alertas e SIEM** | Configurar ferramentas de Monitoramento de Segurança (SIEM/IDS) para emitir alertas imediatos quando detectarem *password spraying* (ex: vários bloqueios de conta diferentes em um curto intervalo de tempo). |
+| **Criptografia/Descriptografia** | Usa uma chave simétrica gerada de forma segura para criptografia ou conteúdo de arquivos de teste. | `criptografia.fernet` |
+|  Kali Línux Arquivos Alvo Metasploitável 2  ** Cria arquivos de texto * para simular dados importantes (Arquivos Alvo**`). | Cria arquivos de texto * para dados importantes semelhantes (`. .txt`). |
+| :--- ** :--- Mensagem de Resgate **Mensagem de Resgate** | Gera um arquivo `LEIA_ME_RESGATE.txt` após a criptografia. | Manipulação de Arquivos |
+| 192.168.56.101 **Extensão** 192.168.56.102 | Adiciona a extensão `. .bloqueado` aos arquivos criptografados. | Módulo `os` |
+
+### 🛠️ Estrutura e Execução
+
+O processo é dividido em três fases simuladas:
+
+1.   3. Cenários de Ataque Simulados e Análise`ransomware_parte1_preparacao.py`**: Cria arquivos de teste e gera a `chave_secreta.key` (simulando a geração da chave no servidor do atacante).
+2.  **`ransomware_parte2_criptografar.py`**: Leia a chave, itera sobre a massa de teste e criptografia todos os arquivos, deixando a nota de resgate.
+3.Os testes foram realizados utilizando uma ferrama 3.Medusa**`** para validar a exposição de serviços a ataques de dicionário e 
 
 ---
 
-## Conclusão
+## 2. Keylogger Simulado (Captura e Exfiltração de Dados)
 
-O desafio confirmou a eficácia da ferramenta Medusa em explorar serviços sem controles de segurança robustos. A parte mais valiosa do exercício foi a estruturação e documentação das defesas, reforçando que a **prevenção** por meio de **MFA**, **Rate Limiting** e **políticas de senha forte** é a única forma eficaz de neutralizar essa classe de ameaças.
+O Keylogger simula a captura de técnicas digitais e o ambiente furtivo dos dados para um ataque via e-mail.
+
+### ⚙️ Detalhes da Implementação
+
+## Recurso 
+| :--- | :--- | :--- |
+| **Comandos Utilizados (Estrutura Genérica):** | Registra tanto caracteres alfanuméricos quanto teclas especiais (Shift, Enter) em um arquivo de log (**Captura de Teclas**). | `pynput` Registra tanto caracteres alfanuméricos quanto técnicas especiais (Shift, Enter) em um arquivo de log (
+| ```Registro Furtivo**bater| Executa como um *listener* em segundo plano para capturar os eventos do teclado. | `pynput.keyboard.Listener` |
+|  medusa -h [192.168.56.102] -u [usuarios.txt] -P [senhas.txt] -M [ftp] -n [21]Exfiltração (Envio Automático)** | Envia o arquivo de log como anexo via e-mail utilizando o protocolo SMTP. | `smtplib` e `email.mime` |
+| ```Segurança do Envio** | Utiliza TLS (**Segurança do Meio Ambiente**) para criptografar a comunicação com o servidor SMTP, imitando a prática comum em ataques. | `smtplib` Utilize TLS (
+
+### ⚠️ Notas de Configuração
+
+* Para a funcionalidade de ambiente de e-mail funcional, é necessário configurar credenciais de e-mail de teste no script `keylogger_parte2_email.py` (preferencialmente utilizando uma **Senha de Aplicativo** em vez da senha principal da conta).
+
+---
+
+## 3. 🧠 Reflexão e Estratégias de Defesa (Defesa em Profundidade)
+
+A conclusão principal deste desafio é o entendimento de como mitigar esses ataques. A defesa não se limita a uma música ferrama, mas a uma abordagem em camadas (*Defesa em Profundidade*).
+
+| :--- | :--- | :--- | 🛡️ Medidas de Prevenção e Mitigação
+
+| Camada de Defesa | Ransomware | Keylogger |
+| :--- | :--- | :--- |
+| **1. Proteção de ponto final** | **EDR/Antivírus:** Detecção de **comportamento** (criptografia rápida de múltiplos arquivos). | **Detecção de Ganchos:** Bloco de APIs de monitoramento de texto ou processos suspeitos. |
+| **2. Proteção de Dados** | **Backup 3-2-1:** Ter cópias offline/imutáveis é a única garantia de recuperação sem pagamento ou resgate. | Configurar ferramentas de Monitoramento de Segurança (SIEM/IDS) para emitir alertas imediatos quando detectar **Gerenciadores de Senhas:** Elimina a necessidade de digitalizar credenciais, tornando o Keylogger ineficaz para capturar senhas. |
+| **3. Segurança de Rede** | **Firewall:** Bloco de conexões de saúde suspeitas (Servidor C&C) para transmissão da chave de criptografia. | **Filtros de Saída:** Bloco da exfiltração de dados (envio do log) para servidores SMTP descartados ou não autorizados. |
+| **4. Isolamento** | **Sandboxing / Máquinas Virtuais:** Executar alguns suspeitos em ambientes isolados para que a criptografia não afete o sistema principal. | Prevenir a instalação do *ouvinte* sem sistema operacional principal. |
+| **5. Conscientização** | Tratamento contra Phishing e Engenharia Social, que são os principais vetores de entrega do malware. | Não baixar ou executar arquivos de fontes descobertas ou e-mails suspeitos. |
+
+### 💡 Lições Aprendidas
+
+1.  **Velocidade do Ransomware:** Uma criptografia simétrica é extremamente rápida. A janela de detecção é curta, reforçando a necessidade de EDRs que reajam ao comportamento, e não apenas a assinaturas.
+2.  **O Ponto Fraco do Keylogger:** A fase mais vulnerável do Keylogger é a **Exfiltração**. Bloquear o ambiente de dados via rede (mesmo via canais criptografados como TLS) é uma defesa fundamental.
+3.  **Ambiente Controlado:** A importância de ambientes de teste (VMs) para estudos de segurança é inegável, permitindo uma análise de códigos maliciosos sem riscos.
